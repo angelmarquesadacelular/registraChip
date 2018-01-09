@@ -1,8 +1,10 @@
 <?php
 error_reporting(E_ERROR);
 require "php/claseSesion.php";
+require "php/library/nusoap/lib/nusoap.php";
 
 $sesion = new Sesion();
+$cliente = new nusoap_client("http://atc.mx/WebService/Aplicacion%20de%20escritorio/seguridad/seguridad.php?wsdl",false);
 if ($sesion->estadoLogin()==true) {
 $datosUsuario=$sesion->datosUsuario();
   $usuarioID=$datosUsuario[0];
@@ -30,17 +32,8 @@ $datosUsuario=$sesion->datosUsuario();
 	<div class="container">
       <ul id="nav" >
           <li ><a href="recarga">Inicio</a></li>
-          <li class="active"><a href="">Reporte</a></li>
-            <?php if ($permisoID == 1) {
-            echo '<li ><a href="cliente">Cliente</a></li>';
-          }
-          else{
-           echo '<li ><a href="estadoCuenta">Estado Cuenta</a></li>'; 
-          } ?>
-          <?php if ($permisoID == 1) {
-            echo '<li ><a href="reporteSaldo">Saldo Clientes</a></li>';
-          } ?>
-            <li ><a href="cambioPassword">Cuenta</a></li>
+          <li class="active"><a href="">Reporte Clientes</a></li>
+            <li ><a href="cliente">Agregar Cliente</a></li>
             <li><a href="consultaFolio">Número</a></li>
             <ul id="nav-right">
               <li class="push-right"><a href="loginOut">Cerrar Sesion </a></li>
@@ -54,7 +47,7 @@ $datosUsuario=$sesion->datosUsuario();
 		<br>
 
 		<p><br></p>
-		<h1>Reporte de Recargas</h1>
+		<h1>Reporte de Clientes</h1>
 	</div>
 	<?php
 			date_default_timezone_set('america/mexico_city');
@@ -63,34 +56,27 @@ $datosUsuario=$sesion->datosUsuario();
 	<div class= "fecha">
 		<article id='art1' class='col-lg-11 col-md-11 col-sm-11 col-xs-12'>
 		<form id="formulario">
-			<p><label for="fecha"> DE:
-				<input type="date" name="fechainicio"  step="1" value="<?php echo date("Y-m-d");?>">
+			<p><label for="fecha"> Ruta	
+			<?php
+          		$res=puntoVenta($empresaID);
+        	?>
+        	<select class="select" required id="ruta" name="ruta">
+
+          <?php
+            while($fila=$res->fetch_array(MYSQLI_ASSOC)){
+          ?>
+
+          <option value="<?php echo $fila['id']; ?>"><?php echo $fila['tipo']; ?></option>
+
+          <?php } ?>
+
+          </select>
 			<input id="boton_enviar" method='post' type="submit">
 
-			<?php
-	$fechaIn = $_POST["fechainicio"];
-	
-if (empty($fechaIn)){
-	$id=$usuarioID;
-	$fechaIn=date("Y-m-d");
-	$fechafi=date("Y-m-d");
-	if($permisoID == 2){
-		
-	$result = Reporte($id,$fechaIn);
-	}else{
-	$result = reporteAdministrador($empresaID,$fechaIn);
-	}
-	
-} else {
-	$id=$usuarioID;
-	if($permisoID == 2){
-	$result = Reporte($id,$fechaIn);
-	}else{
-	$result = reporteAdministrador($empresaID,$fechaIn);
-	}
-}
-
-?>
+		<?php
+			$puntoVenta = $_POST["ruta"];
+			$result = ReporteClientes($puntoVenta);
+		?>
 
 		    </div>
 		    </label>
@@ -103,11 +89,13 @@ if (empty($fechaIn)){
 <table class="responstable">
 	<br>
   <tr>
-    <th>Compañia</th>
-    <th data-th="Driver details"><span>Número</span></th>
-    <th>Fecha</th>
-    <th>Monto</th>
-    <th>Cliente</th>
+    <th>R</th>
+    <th data-th="Driver details"><span>Nombre</span></th>
+    <th>Dirección</th>
+    <th>Teléfono</th>
+    <th>Email</th>
+    <th>Nick</th>
+    <th>Password</th>
   </tr>
 				  <?php
 				  while ($row = mysqli_fetch_array($result)){
@@ -116,8 +104,12 @@ if (empty($fechaIn)){
 							echo "<td height = 10>"."   ".$row[0]."   "."</td>";
 							echo "<td height = 10>"."   ".$row[1]."   "."</td>";
 							echo "<td height = 10>"."   ".$row[2]."   "."</td>";
-							echo "<td height = 10>"."$".$row[3]."   "."</td>";
+							echo "<td height = 10>"."   ".$row[3]."   "."</td>";
 							echo "<td height = 10>"."   ".utf8_encode($row[4])."   "."</td>";
+							echo "<td height = 10>"."   ".$row[5]."   "."</td>";
+							$parametros = array('passwordEncriptado'=>$row[6]);
+      						$passencriptado = $cliente->call('desencriptar',$parametros);
+							echo "<td height = 10>"."   ".$passencriptado."   "."</td>";;
 							echo "</tr>";
 				  }
 

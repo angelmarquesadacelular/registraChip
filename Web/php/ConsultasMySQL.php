@@ -1,12 +1,42 @@
 ﻿<?php
 	error_reporting(0);
-	$db = new mysqli('localhost', 'root', 'root', 'recargaclientes');
+	$db = new mysqli('localhost', 'root', 'root', 'recargasatc');
 
 	if ($db->connect_error) 
 	{
 
 		echo "<script language=\"JavaScript\">alert(\"Error en la conexion de la base de datos (cMysql)\");</script>";
 		die();
+	}
+
+	//Funcion que saca los datos para el reporte
+	function ReporteClientes($puntoVenta_id)
+	{
+		$query = "SELECT CONCAT(pv.tipo,'-',cc.numero),cli.nombre,cli.direccion,cli.telefono,cli.email,pc.nickname,pc.pass
+					FROM punto_venta pv,cliente cli,clave_cliente cc,permiso_cliente pc
+					WHERE cc.puntoventa_id=pv.id
+					AND cc.cliente_id=cli.id
+					AND pc.cliente_id=cli.id
+					AND pv.id='$puntoVenta_id';";
+
+		global $db;
+		$result = $db->query($query);
+		
+		return $result;
+	}
+
+	//Función que obtiene los puntos de venta
+	function puntoVenta($empresa_id)
+	{
+		$query = "SELECT id, tipo FROM punto_venta WHERE empresa_id='$empresa_id'";
+		global $db;
+	
+		$result =  $db->query($query);
+		//$row=mysqli_fetch_row($result);
+		//$count=$row[0];
+	
+		//mysqli_close($db);
+		return $result;
 	}
 
 	//Funcion que inserta el chip a la tabla cuando ya fue activado
@@ -398,7 +428,9 @@
 	//Función que saca si existen los datos del login del cliente
 	function loginCliente($nick, $pass)
 	{
-		$query = "SELECT usu.id,usu.empresa_id,usu.permiso_id from permiso_usuario pu, usuario usu where pu.usuario_id = usu.id and pu.nickname = '$nick' and pu.pass = '$pass' AND usu.activo = true";
+		$query = "SELECT adm.id,adm.empresa_id,pa.permiso_id 
+		from permiso_administrador pa, administrador adm 
+		where pa.administrador_id = adm.id and pa.nickname = '$nick' and pa.pass = '$pass'";
 		global $db;
 	
 		$result =  $db->query($query);

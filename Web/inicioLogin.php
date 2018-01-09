@@ -12,7 +12,6 @@ if (isset($_POST["nick"]))
     $pass = $_POST["pass"];
     $parametros = array('password'=>$pass);
     $passencriptado = $cliente->call('encriptar',$parametros);
-
 	//Checa si la persona logeada es administrador
 	$resultado = loginCliente($usuario, $passencriptado);
 	if ($resultado[0] > 0)
@@ -28,7 +27,7 @@ if (isset($_POST["nick"]))
 	else
 	{
 				
-		echo "<script language=\"JavaScript\">alert('$usuario, usted no esta autorizado para acceder.');location.href='login';</script>";
+		echo "<script language=\"JavaScript\">alert('$usuario,$passencriptado usted no esta autorizado para acceder.');location.href='login';</script>";
 	}
 }
 ?>
