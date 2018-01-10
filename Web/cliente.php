@@ -92,17 +92,8 @@ $datosUsuario=$sesion->datosUsuario();
   <div class="container">
       <ul id="nav" >
           <li ><a href="recarga">Inicio</a></li>
-          <li ><a href="reporte">Reporte</a></li>
-            <?php if ($permisoID == 1) {
-            echo '<li class="active"><a href="">Cliente</a></li>';
-          }
-          else{
-           echo '<li ><a href="estadoCuenta">Estado Cuenta</a></li>'; 
-          } ?>
-          <?php if ($permisoID == 1) {
-            echo '<li ><a href="reporteSaldo">Saldo Clientes</a></li>';
-          } ?>
-            <li ><a href="cambioPassword">Cuenta</a></li>
+          <li ><a href="reporte">Reporte Clientes</a></li>
+            <li class="active"><a href="">Agregar Cliente</a></li>
             <li><a href="consultaFolio">Número</a></li>
             <ul id="nav-right">
               <li class="push-right"><a href="loginOut">Cerrar Sesion </a></li>
@@ -117,14 +108,34 @@ $datosUsuario=$sesion->datosUsuario();
   <h1><img src="img/atc1.png">ctivaChip</h1>
 
     <form id="formulario" method='post'  autocomplete="off">
+      <tr>
+        <?php
+              $res=puntoVenta($empresaID);
+          ?>
+        <td>Ruta
+        </td>
+        <td>
+          <select class="select" required id="ruta" name="ruta" onchange="myFunction(this.value)">
 
+          <?php
+            while($fila=$res->fetch_array(MYSQLI_ASSOC)){
+          ?>
+
+          <option value="<?php echo $fila['id']; ?>"><?php echo $fila['tipo']; ?></option>
+
+          <?php } ?>
+
+        </select>
+        </td>
+        
+      </tr>
       <input required id="nombre" name="nombre" type="text" placeholder="Nombre" autofocus/>
       <input required id="direccion" name="direccion" type="text" placeholder="Dirección"/>
       <input required id="telefono" maxlength="10" onkeypress = 'return tel(event)' maxlength="10" name="telefono" type="text" placeholder="Teléfono"/>
       <input required id="email" name="email" type="text" placeholder="Email"/>
       <input required id="nick" name="nick" type="text" placeholder="Nickname"/>
       <input required id="pass" name="pass" type="text" placeholder="Password"/>
-      
+      <input id="tFileName" name="tFileName" type="file" size="60">
       <!--<     -->
       
       <button id="btn_enviar" color = "black" onclick="puntero()">Aceptar</button>

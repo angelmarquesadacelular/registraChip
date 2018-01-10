@@ -9,6 +9,33 @@
 		die();
 	}
 
+	//Funcion que obtiene la ruta seleccionada
+	function puntoVentaTipo($puntoventa_id)
+	{
+		$query = "SELECT tipo
+					FROM punto_venta
+					WHERE id = '$puntoventa_id'";
+		global $db;
+	
+		$result =  $db->query($query);
+		$row=mysqli_fetch_row($result);
+		return $row[0];
+	}
+
+	//Funcion que obtiene la ultima clave de cliente
+	function claveCliente($puntoventa_id)
+	{
+		$query = "SELECT numero
+					FROM clave_cliente
+					WHERE puntoventa_id = '$puntoventa_id'
+					ORDER BY numero DESC LIMIT 1";
+		global $db;
+	
+		$result =  $db->query($query);
+		$row=mysqli_fetch_row($result);
+		return $row[0];
+	}
+
 	//Funcion que saca los datos para el reporte
 	function ReporteClientes($puntoVenta_id)
 	{
@@ -231,12 +258,12 @@
 		return $row[0];
 	}	
 	//Funcion que inserta un nuevo usuario
-	function insertarUsuario($nombre, $direccion, $telefono, $email, $empresa_id,$permiso_id)
+	function insertarUsuario($nombre, $direccion, $telefono, $email, $empresa_id)
 	{
 		global $db;
 
-		$query= "INSERT INTO usuario(nombre, direccion, telefono, email, activo, empresa_id,permiso_id) 
-				VALUES ('$nombre', '$direccion', '$telefono', '$email',true,$empresa_id,$permiso_id);";
+		$query= "INSERT INTO cliente(nombre, direccion, telefono, email, activo, empresa_id) 
+				VALUES ('$nombre', '$direccion', '$telefono', '$email',true,$empresa_id);";
 		$result = $db->query($query);
 	
 	}
@@ -246,22 +273,31 @@
 	{
 		global $db;
 
-		$query= "INSERT INTO permiso_usuario(nickname,pass,activo,usuario_id) 
+		$query= "INSERT INTO permiso_cliente(nickname,pass,activo,cliente_id) 
 				VALUES ('$nick', '$pass',true,$usuario_id);";
+		$result = $db->query($query);
+	}
+
+	//Funcion que inserta clave cliente
+	function insertarClaveCliente($numero, $cliente_id,$puntoventa_id)
+	{
+		global $db;
+
+		$query= "INSERT INTO clave_cliente(numero,activo,cliente_id,puntoventa_id) 
+				VALUES ('$numero', true,$cliente_id,$puntoventa_id);";
 		$result = $db->query($query);
 	}
 	
 	//Función que obtiene el id del susrio
-	function obtenerIdUsuario($nombre, $direccion, $telefono, $email, $empresa_id,$permiso_id)
+	function obtenerIdUsuario($nombre, $direccion, $telefono, $email, $empresa_id)
 	{
 		$query = "SELECT id
-					FROM usuario 
+					FROM cliente 
 					WHERE nombre = '$nombre'
 					AND direccion = '$direccion'
 					AND telefono = '$telefono'
 					AND email = '$email'
-					AND empresa_id = $empresa_id
-					AND permiso_id = $permiso_id";
+					AND empresa_id = $empresa_id";
 		global $db;
 	
 		$result =  $db->query($query);

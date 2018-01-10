@@ -25,17 +25,19 @@
 		
 		//Hace la orden y realiza la recarga
 		$codigoError = 0;
-		$contador = 1;
+		$contador = 0;
 		do
 		{
 			//Arma la orden
 
 			$resultado = getOrder($empresaID, $idProducto, $numero, $folioCliente);
+			
 			//Saca el id de la orden
 			$idOrden = $resultado["TopUpID"]["topUpIDValue"];
 			//print_r($idOrden);
 			$orden = doOrder($empresaID, $idOrden, $folioCliente);
-			//print_r($orden);
+			$valor = checkOrder($empresaID, $idOrden, $folioCliente);
+			print_r($valor);
 			//Si dio un error en la recarga se registra
 			if(isset($orden["TopUpResult"]["errorCode"]))
 			{
@@ -68,7 +70,6 @@
 				$mensaje = $orden["TopUpResult"]["ticket"];
 				$codigoError = 0;
 			}
-			
 			$contador++;
 		}while($contador < 1 && ($codigoError == 19 || $codigoError == 9));
 		

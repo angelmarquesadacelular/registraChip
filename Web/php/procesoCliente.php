@@ -26,13 +26,16 @@ if ($sesion->estadoLogin()==true)
   	$permisoID=$datosUsuario[2];
 	
 	//Recibe los datos para trabajar correctamente
+  	$rutaId = $_POST['ruta'];
   	$nombre = $_POST['nombre'];
   	$direccion = $_POST['direccion'];
   	$telefono = $_POST['telefono'];
   	$email = $_POST['email'];
   	$nick = $_POST['nick'];
   	$pass = $_POST['pass'];
-  	$permiso_id = 2;
+  	$archi = $_POST['tFileName'];
+  	echo $rutaId;
+  	echo $archi;
 	if (!empty($nombre))
 	{
 		//Verifica si tiene email si no coloca S/R
@@ -41,18 +44,20 @@ if ($sesion->estadoLogin()==true)
 			$email = "S/R";
 		}
 		//Captura el nuevo cliente
-		insertarUsuario($nombre,$direccion,$telefono,$email,$empresaID,$permiso_id);
+		insertarUsuario($nombre,$direccion,$telefono,$email,$empresaID);
 		//Generar el password encriptado
 		$parametros = array('password'=>$pass);
     	$pwsOldEncriptado = $cliente->call('encriptar',$parametros);
-    	$resultUsuario = obtenerIdUsuario($nombre,$direccion,$telefono,$email,$empresaID,$permiso_id);
-  
+    	$resultUsuario = obtenerIdUsuario($nombre,$direccion,$telefono,$email,$empresaID);
+  		
     	
     	if(!empty($resultUsuario))
     	{
     		insertarPermisoUsuario($nick,$pwsOldEncriptado,$resultUsuario);
-    		$valor = 0;
-    		insertarSaldo($valor,$resultUsuario);
+    		$valor = claveCliente($rutaId);
+    		$valor = $valor+1;
+    		$valor = str_pad($valor, 3, "0", STR_PAD_LEFT);
+    		insertarClaveCliente($valor, $resultUsuario,$rutaId);
     		echo "<script language=\"JavaScript\">swal('Proceso exitoso.','¡Cliente guardado con exito!','success');";
 			echo "document.getElementById('nombre').value = '';";
 			echo "document.getElementById('direccion').value = '';";
